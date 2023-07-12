@@ -1,0 +1,102 @@
+import numpy as np 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+data = pd.read_csv(r"C:\Users\dell\OneDrive\Desktop\Data analytics files\csv_data.csv")
+data
+
+data.shape
+data.head()
+data.tail()
+data.isnull().sum()
+data.Alcohol.value_counts(dropna=False)
+data.Alcohol.fillna("Not Availabel",inplace=True)
+data.Alcohol.value_counts()
+data.isnull().sum()*100/len(data)
+
+data.head(10)
+data.drop("S.No.",inplace=True,axis=1)
+ax = data.Category.value_counts().plot(kind='bar')
+for i in ax.containers:
+    ax.bar_label(i)
+
+ax = data.State.value_counts().nlargest(10).plot(kind='bar')
+for i in ax.containers:
+    ax.bar_label(i)
+
+ax = data.State.value_counts().nsmallest(10).plot(kind='bar')
+for i in ax.containers:
+    ax.bar_label(i)
+
+data.Alcohol.value_counts().plot(kind='pie',autopct='%.2f')
+plt.show()
+
+data['Category'] = data['Category'].str.split(" ").str[0]
+
+data.info()
+data = data.astype({"Category":"int"})
+data.info()
+
+data.rename(columns={"Category":"RatingStar"},inplace=True)
+data.head()
+data.City
+data.dropna(how="any",inplace=True)
+data.shape
+
+missing_values = data.isnull().sum()
+
+# Print the missing values
+print(missing_values)
+
+duplicated_rows = data.duplicated()
+
+print(duplicated_rows)
+# Create a new column called amenities
+data['amenities'] = data['RatingStar'].apply(lambda rating: 'High amenities' if rating >= 3 else 'Low amenities')
+data
+
+s_names = data.State.value_counts().index
+s_hotels = data.State.value_counts().values
+
+hotels = data.groupby('State').size().reset_index().rename(columns={'size': 'Hotels'})
+
+print(hotels)
+
+ratings = data.RatingStar.value_counts().index
+ratings_count = data.RatingStar.value_counts().values
+
+ratings
+# Create a pie chart of the star category hotel share
+plt.pie(ratings_count, labels=ratings, autopct="%1.2f%%")
+plt.title("Star category hotel share")
+plt.show()
+
+rating = data.groupby("RatingStar").size().reset_index()
+rating
+#Therefore 3 star hotels dominate the tourism industry!
+
+h_in_city = data.groupby("City").size().reset_index().rename(columns={0:'Hotels'})
+h_in_city = h_in_city.sort_values(by='Hotels',ascending=False)
+
+h_in_city[0:9]
+matplotlib.rcParams['figure.figsize'] = (30,15)
+p = sns.barplot(x='City',y='Hotels',data = h_in_city[0:9])
+p.bar_label(p.containers[0])
+plt.title("No. of Hotels top 10 cities")
+p.set_xticklabels(labels=h_in_city["City"][0:9], rotation=35)
+sns.set(font_scale=1.25)
+plt.show()
+#Ernakulam has the most no. of hotels
+
+data.info()
+s_rooms = data.groupby("State")["Total Rooms"].sum().reset_index()
+s_rooms.head()
+matplotlib.rcParams['figure.figsize'] = (30,15)
+p = sns.barplot(x='State',y='Total Rooms',data = s_rooms)
+p.bar_label(p.containers[0])
+plt.title("No. of Rooms in each state")
+p.set_xticklabels(labels=s_rooms["State"], rotation=35)
+sns.set(font_scale=1.25)
+plt.show()
+#Kerala has 13554 rooms, which is the highest!. Summary: This data and its visualization shows us that Kerala is dominant in the tourism and hospitality industry!
